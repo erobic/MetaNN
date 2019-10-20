@@ -41,14 +41,16 @@ class DependentModule(Module):
         return module
 
     def __init__(self, *args, **kwargs):
-        self._dependents = SubDict(self._buffers)
-        self._active_dependents = SubDict(self._dependents)
+        # self._dependents = SubDict(self._buffers)
+        self._dependents = SubDict(self._parameters, self._parameters.keys())
+        self._active_dependents = SubDict(self._dependents, self._parameters.keys())
         self._dependents_shapes = {}
 
     def _reinit(self):
 
-        self._dependents = SubDict(self._buffers)
-        self._active_dependents = SubDict(self._dependents)
+        # self._dependents = SubDict(self._buffers)
+        self._dependents = SubDict(self._parameters, self._parameters.keys())
+        self._active_dependents = SubDict(self._dependents, self._parameters.keys())
         self._dependents_shapes = {}
 
     def __setattr__(self, name, value):

@@ -1,6 +1,7 @@
 import pytest
 import sys
 from copy import deepcopy
+
 sys.path.append('../')
 
 import torch
@@ -18,7 +19,7 @@ class Flatten(nn.Module):
         return x.view(x.size(0), -1)
 
 
-def test_dependent_module():
+def test_dependent_module1():
     net = nn.Sequential(
         nn.Conv2d(3, 3, 3),
         nn.Conv2d(3, 3, 3),
@@ -28,6 +29,23 @@ def test_dependent_module():
     net = DependentModule(net).to(device)
     x = torch.randn(3, 3, 5, 5).to(device)
     print(net)
+    print("here")
+    for p in net.dependents():
+        print(f"dependent {p}")
+    assert net(x).shape == torch.Size([3, 4])
+
+
+def test_dependent_module():
+    net = nn.Sequential(
+        DependentModule(nn.Conv2d(3, 3, 3)),
+        DependentModule(nn.Conv2d(3, 3, 3)),
+        Flatten(),
+        DependentModule(nn.Linear(3, 4)),
+    )
+    net = DependentModule(net).to(device)
+    x = torch.randn(3, 3, 5, 5).to(device)
+    for p in net.dependents():
+        print(f"dependent {p}")
     assert net(x).shape == torch.Size([3, 4])
 
 
@@ -57,3 +75,7 @@ def test_resnet():
         return
     finally:
         return
+
+
+if __name__ == "__main__":
+    test_dependent_module()
